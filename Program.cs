@@ -20,15 +20,15 @@ namespace RC2FptrScript
             Console.ReadLine();
             var dir = Path.Combine(AppContext.BaseDirectory, "Scripts");
             var files = Directory.GetFiles(args[0]);
-            if(Directory.Exists(dir)) Directory.Delete(dir);
+            if(Directory.Exists(dir)) Directory.Delete(dir, true);
             Directory.CreateDirectory(dir);
             foreach (var file in files)
             {
-                var filename = Path.Combine(dir, $"{DateTime.Now:O}.txt");
+                var filename = Path.Combine(dir, $"{DateTime.Now:yyyyMMddHHmmssfff}.txt");
                 using var fs = File.Open(file, FileMode.Open, FileAccess.Read);
                 var receipts = JsonSerializer.Deserialize(fs, ReceiptSerializationContext.Default.ReceiptArray)!;
                 var text = new StringBuilder();
-                foreach(var rec in receipts)
+                    foreach (var rec in receipts)
                 {
                     text.AppendLine($"Fptr.setParam(1178, new Date(\"{rec.Created:yyyy'-'MM'-'dd'T'HH':'mm':'ss}\"));");
                     text.AppendLine($"Fptr.setParam(1179, \"{rec.ActNumber ?? " "}\");");
@@ -42,14 +42,14 @@ namespace RC2FptrScript
                         Operation.RefundOutcome => "LIBFPTR_RT_BUY_RETURN_CORRECTION",
                     };
 
-                    text.AppendLine($"Fptr.setParam(Fptr.LIBFPTR_PARAM_RECEIPT_TYPE, {op});");
+                        text.AppendLine($"Fptr.setParam(Fptr.LIBFPTR_PARAM_RECEIPT_TYPE, Fptr.{op});");
                     text.AppendLine("Fptr.setParam(Fptr.LIBFPTR_PARAM_RECEIPT_ELECTRONICALLY, true);");
                     text.AppendLine($"Fptr.setParam(1192, \"{rec.FiscalSign}\");");
                     text.AppendLine($"Fptr.setParam(1173, {(int)rec.CorrectionType});");
                     text.AppendLine("Fptr.setParam(1174, correctionInfo);");
                     text.AppendLine("Fptr.openReceipt();");
 
-                    foreach(var pos in rec.Items)
+                    foreach (var pos in rec.Items)
                     {
                         text.AppendLine($"Fptr.setParam(Fptr.LIBFPTR_PARAM_COMMODITY_NAME, \"{pos.Name}\");");
                         text.AppendLine($"Fptr.setParam(Fptr.LIBFPTR_PARAM_PRICE, {Math.Round(pos.Price / 100.0, 2)});");
@@ -63,31 +63,31 @@ namespace RC2FptrScript
                     }
                     text.AppendLine($"Fptr.setParam(Fptr.LIBFPTR_PARAM_SUM, {Math.Round(((uint)rec.RoundedSum!) / 100.0, 2)});");
                     text.AppendLine("Fptr.receiptTotal();");
-                    if(rec.Payment.Cash > 0)
+                    if (rec.Payment.Cash > 0)
                     {
                         text.AppendLine("Fptr.setParam(Fptr.LIBFPTR_PARAM_PAYMENT_TYPE, Fptr.LIBFPTR_PT_CASH);");
                         text.AppendLine($"Fptr.setParam(Fptr.LIBFPTR_PARAM_PAYMENT_SUM, {Math.Round(rec.Payment.Cash / 100.0, 2)});");
                         text.AppendLine("Fptr.payment();");
                     }
-                    if(rec.Payment.ECash > 0)
+                    if (rec.Payment.ECash > 0)
                     {
                         text.AppendLine("Fptr.setParam(Fptr.LIBFPTR_PARAM_PAYMENT_TYPE, Fptr.LIBFPTR_PT_ELECTRONICALLY);");
                         text.AppendLine($"Fptr.setParam(Fptr.LIBFPTR_PARAM_PAYMENT_SUM, {Math.Round(rec.Payment.ECash / 100.0, 2)});");
                         text.AppendLine("Fptr.payment();");
                     }
-                    if(rec.Payment.Pre > 0)
+                    if (rec.Payment.Pre > 0)
                     {
                         text.AppendLine("Fptr.setParam(Fptr.LIBFPTR_PARAM_PAYMENT_TYPE, Fptr.LIBFPTR_PT_PREPAID);");
                         text.AppendLine($"Fptr.setParam(Fptr.LIBFPTR_PARAM_PAYMENT_SUM, {Math.Round(rec.Payment.Pre / 100.0, 2)});");
                         text.AppendLine("Fptr.payment();");
                     }
-                    if(rec.Payment.Post > 0)
+                    if (rec.Payment.Post > 0)
                     {
                         text.AppendLine("Fptr.setParam(Fptr.LIBFPTR_PARAM_PAYMENT_TYPE, Fptr.LIBFPTR_PT_CREDIT);");
                         text.AppendLine($"Fptr.setParam(Fptr.LIBFPTR_PARAM_PAYMENT_SUM, {Math.Round(rec.Payment.Post / 100.0, 2)});");
                         text.AppendLine("Fptr.payment();");
                     }
-                    if(rec.Payment.Provision > 0)
+                    if (rec.Payment.Provision > 0)
                     {
                         text.AppendLine("Fptr.setParam(Fptr.LIBFPTR_PARAM_PAYMENT_TYPE, Fptr.LIBFPTR_PT_OTHER);");
                         text.AppendLine($"Fptr.setParam(Fptr.LIBFPTR_PARAM_PAYMENT_SUM, {Math.Round(rec.Payment.Provision / 100.0, 2)});");
