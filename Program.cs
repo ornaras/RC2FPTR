@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
+using System.Text;
 using System.Text.Json;
 using RetailCorrector;
 
@@ -98,6 +99,7 @@ namespace RC2FptrScript
                 }
                 File.WriteAllText(filename, text.ToString());
             }
+            Process.Start("explorer.exe", dir);
         }
     }
 }
