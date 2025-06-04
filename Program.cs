@@ -7,20 +7,13 @@ namespace RC2FptrScript
 {
     internal class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
-            if(args.Length == 0)
-            {
-                Console.WriteLine("Синтаксис запуска утилиты: RC2FPTR (путь к папке с чеками)");
-                Console.WriteLine("Нажмите на ENTER, для закрытия утилиты.");
-                Console.ReadLine();
-                return;
-            }
             Console.WriteLine("В данный момент утилита поддерживает только ФФД 1.2!");
             Console.WriteLine("Нажмите на ENTER, для продолжения.");
             Console.ReadLine();
             var dir = Path.Combine(AppContext.BaseDirectory, "Scripts");
-            var files = Directory.GetFiles(args[0]);
+            var files = Directory.GetFiles(RetailCorrector.Constants.Pathes.Receipts);
             if(Directory.Exists(dir)) Directory.Delete(dir, true);
             Directory.CreateDirectory(dir);
             foreach (var file in files)
@@ -29,7 +22,7 @@ namespace RC2FptrScript
                 using var fs = File.Open(file, FileMode.Open, FileAccess.Read);
                 var receipts = JsonSerializer.Deserialize(fs, ReceiptSerializationContext.Default.ReceiptArray)!;
                 var text = new StringBuilder();
-                    foreach (var rec in receipts)
+                foreach (var rec in receipts)
                 {
                     text.AppendLine($"Fptr.setParam(1178, new Date(\"{rec.Created:yyyy'-'MM'-'dd'T'HH':'mm':'ss}\"));");
                     text.AppendLine($"Fptr.setParam(1179, \"{rec.ActNumber ?? " "}\");");
@@ -43,7 +36,7 @@ namespace RC2FptrScript
                         Operation.RefundOutcome => "LIBFPTR_RT_BUY_RETURN_CORRECTION",
                     };
 
-                        text.AppendLine($"Fptr.setParam(Fptr.LIBFPTR_PARAM_RECEIPT_TYPE, Fptr.{op});");
+                    text.AppendLine($"Fptr.setParam(Fptr.LIBFPTR_PARAM_RECEIPT_TYPE, Fptr.{op});");
                     text.AppendLine("Fptr.setParam(Fptr.LIBFPTR_PARAM_RECEIPT_ELECTRONICALLY, true);");
                     text.AppendLine($"Fptr.setParam(1192, \"{rec.FiscalSign}\");");
                     text.AppendLine($"Fptr.setParam(1173, {(int)rec.CorrectionType});");

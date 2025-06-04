@@ -11,6 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\RetailCorrector\RetailCorrector.Constants\RetailCorrector.Constants.csproj" />
     <ProjectReference Include="..\RetailCorrector\RetailCorrector.Data\RetailCorrector.Data.csproj" />
   </ItemGroup>
 
