@@ -11,8 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RetailCorrector\RetailCorrector.Constants\RetailCorrector.Constants.csproj" />
-    <ProjectReference Include="..\RetailCorrector\RetailCorrector.Data\RetailCorrector.Data.csproj" />
+    <PackageReference Include="RetailCorrector.PluginAPI" Version="1.6.0" />
   </ItemGroup>
 
 </Project>

@@ -7,13 +7,13 @@ namespace RC2FptrScript
 {
     internal class Program
     {
-        static void Main()
+        static void Main(string[] args)
         {
             Console.WriteLine("В данный момент утилита поддерживает только ФФД 1.2!");
             Console.WriteLine("Нажмите на ENTER, для продолжения.");
             Console.ReadLine();
             var dir = Path.Combine(AppContext.BaseDirectory, "Scripts");
-            var files = Directory.GetFiles(RetailCorrector.Constants.Pathes.Receipts);
+            var files = Directory.GetFiles(args[0]);
             if(Directory.Exists(dir)) Directory.Delete(dir, true);
             Directory.CreateDirectory(dir);
             foreach (var file in files)
@@ -55,7 +55,7 @@ namespace RC2FptrScript
                         text.AppendLine($"Fptr.setParam(1214, {(int)pos.PayType});");
                         text.AppendLine("Fptr.registration();");
                     }
-                    text.AppendLine($"Fptr.setParam(Fptr.LIBFPTR_PARAM_SUM, {Math.Round(((uint)rec.RoundedSum!) / 100.0, 2)});");
+                    text.AppendLine($"Fptr.setParam(Fptr.LIBFPTR_PARAM_SUM, {Math.Round(((uint)rec.TotalSum!) / 100.0, 2)});");
                     text.AppendLine("Fptr.receiptTotal();");
                     if (rec.Payment.Cash > 0)
                     {
